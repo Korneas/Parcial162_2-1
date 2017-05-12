@@ -1,16 +1,9 @@
 package parcial2_server;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -18,10 +11,16 @@ import serial.Iniciar;
 import serial.Mensaje;
 
 public class Control extends Observable implements Runnable {
+
+	// Socket para la comunicacion con el cliente
 	private Socket s;
+
+	// Jefe observador del cliente
 	private Observer boss;
+
+	// Identificador del usuario
 	private int id;
-	private boolean life;
+	private boolean life = true;
 
 	public Control(Socket s, Observer boss, int id) {
 		this.s = s;
@@ -29,8 +28,7 @@ public class Control extends Observable implements Runnable {
 		this.id = id;
 		new Thread(this).start();
 
-		System.out.println(s.getInetAddress().getHostAddress());
-
+		// Se crea el color random para el cliente
 		try {
 			float[] col = new float[3];
 			for (int i = 0; i < col.length; i++) {
@@ -39,6 +37,15 @@ public class Control extends Observable implements Runnable {
 			enviar(new Iniciar(col, id));
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+
+		// Si el cliente es el primero en conectarse entonces este comienza
+		if (id == 1) {
+			try {
+				enviar(new Mensaje("comenzar", 0));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -53,6 +60,7 @@ public class Control extends Observable implements Runnable {
 				setChanged();
 				boss.update(this, "finConexion");
 				clearChanged();
+				life = false;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
@@ -67,18 +75,10 @@ public class Control extends Observable implements Runnable {
 		System.out.println("Cliente: Se envio: " + o.getClass());
 	}
 
-	private void clasificar(Object o) {
-		if (o instanceof Mensaje) {
-			Mensaje m = (Mensaje) o;
-
-		}
-	}
-
-	public void recibir() throws IOException, ClassNotFoundException {
+	private void recibir() throws IOException, ClassNotFoundException {
 		ObjectInputStream in = new ObjectInputStream(s.getInputStream());
 		Object recibido = in.readObject();
-		clasificar(recibido);
-		boss.update(null, recibido);
+		boss.update(this, recibido);
 	}
 
 	public int getId() {

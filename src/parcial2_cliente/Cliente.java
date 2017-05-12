@@ -10,10 +10,14 @@ import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
 
-
 public class Cliente extends Observable implements Runnable {
 
+	// Se define el Socket de conexion
 	private Socket s;
+
+	// El Address y el puerto se definen como staticos finales para no permitir
+	// su edicion, el address es 127.0.0.1 por lo que se va a correr en el mismo
+	// entorno de aplicacines
 	private static final String ADDRESS = "127.0.0.1";
 	private static final int PORT = 5000;
 	private boolean life;
