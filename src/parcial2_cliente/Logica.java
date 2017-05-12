@@ -23,22 +23,26 @@ public class Logica implements Observer {
 		super();
 		this.app = app;
 
+		c = new Cliente();
+		new Thread(c).start();
+		c.addObserver(this);
+
 		if (col == null) {
 			col = new float[3];
 		}
-
-		elem = new Elemento(col);
 	}
 
 	public void ejecutar() {
 		app.background(255);
 		if (online) {
-			elem.pintar();
-			elem.mover(0, suma);
-			if (suma <= 400) {
-				suma++;
-			} else {
+			if (actual) {
+				elem.pintar();
+				elem.mover(suma);
+				if (suma <= 450) {
+					suma++;
+				} else {
 
+				}
 			}
 		}
 	}
@@ -52,9 +56,10 @@ public class Logica implements Observer {
 
 		if (arg instanceof Iniciar) {
 			Iniciar in = (Iniciar) arg;
-
 			col = in.getColor();
 			id = in.getId();
+			System.out.println("Mi id es: " + id);
+			elem = new Elemento(app, col, id);
 		} else if (arg instanceof Mensaje) {
 			Mensaje m = (Mensaje) arg;
 

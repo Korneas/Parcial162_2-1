@@ -10,9 +10,6 @@ import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
 
-/**
- * Created by CamiloMontoya on 30/04/17.
- */
 
 public class Cliente extends Observable implements Runnable {
 
@@ -40,7 +37,8 @@ public class Cliente extends Observable implements Runnable {
 				Thread.sleep(500);
 
 			} catch (IOException e) {
-				e.printStackTrace();
+				life = false;
+				System.out.println("No hay conexion");
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {

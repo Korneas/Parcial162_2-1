@@ -4,9 +4,10 @@ import java.io.Serializable;
 
 public class Mensaje implements Serializable{
 	
-	private String msg,send;
+	private String msg;
+	private int send;
 
-	public Mensaje(String msg, String send) {
+	public Mensaje(String msg, int send) {
 		super();
 		this.msg = msg;
 		this.send = send;
@@ -20,11 +21,11 @@ public class Mensaje implements Serializable{
 		this.msg = msg;
 	}
 
-	public String getSend() {
+	public int getSend() {
 		return send;
 	}
 
-	public void setSend(String send) {
+	public void setSend(int send) {
 		this.send = send;
 	}	
 

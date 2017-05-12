@@ -11,21 +11,25 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Observable;
 import java.util.Observer;
 
 import serial.Iniciar;
 import serial.Mensaje;
 
-public class Control implements Runnable {
+public class Control extends Observable implements Runnable {
 	private Socket s;
 	private Observer boss;
 	private int id;
+	private boolean life;
 
 	public Control(Socket s, Observer boss, int id) {
 		this.s = s;
 		this.boss = boss;
 		this.id = id;
 		new Thread(this).start();
+
+		System.out.println(s.getInetAddress().getHostAddress());
 
 		try {
 			float[] col = new float[3];
@@ -36,24 +40,19 @@ public class Control implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		if (id == 1) {
-			try {
-				enviar(new Mensaje("comenzar", "server"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	@Override
 	public void run() {
-		while (true) {
+		while (life) {
 			try {
 				recibir();
 				Thread.sleep(100);
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Problema con cliente " + id);
+				setChanged();
+				boss.update(this, "finConexion");
+				clearChanged();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {

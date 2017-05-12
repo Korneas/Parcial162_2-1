@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import serial.Mensaje;
+
 public class Server extends Observable implements Observer, Runnable {
 
 	private static final int PORT = 5000;
@@ -32,6 +34,10 @@ public class Server extends Observable implements Observer, Runnable {
 			try {
 				System.out.println("Esperando...");
 				users.add(new Control(sS.accept(), this, users.size() + 1));
+				for (int i = 0; i < users.size(); i++) {
+					Control cont = users.get(i);
+					cont.enviar(new Mensaje("total", users.size()));
+				}
 				System.out.println("Nuevo usuario es: " + users.size());
 				Thread.sleep(100);
 			} catch (IOException e) {
@@ -44,9 +50,14 @@ public class Server extends Observable implements Observer, Runnable {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		setChanged();
-		notifyObservers(arg);
-		clearChanged();
+		if (arg instanceof String) {
+			String msg = (String) arg;
+
+			if (msg.contains("finConexion")) {
+				users.remove(o);
+				System.out.println("Clientes restantes: " + users.size());
+			}
+		}
 	}
 
 }

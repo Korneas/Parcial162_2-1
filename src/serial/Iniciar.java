@@ -1,6 +1,8 @@
 package serial;
 
-public class Iniciar {
+import java.io.Serializable;
+
+public class Iniciar implements Serializable{
 
 	private float[] color;
 	private int id;
